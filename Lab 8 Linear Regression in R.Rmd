@@ -15,11 +15,11 @@ library(tidyverse)
 salmon <- read_csv("salmon_imports.csv")
 ```
 
-Make an Exploratory Scatterplot. If we’re going to use linear regression, we should have reason to think that a linear relationship exists between
+###4. Make an Exploratory Scatterplot. If we’re going to use linear regression, we should have reason to think that a linear relationship exists between
 variables. So go ahead and look at the data (year on x-axis, imports on y-axis).
 
 ```{r}
-salmon_scatt <- ggplot(salmon, aes(x = Year, y = salmon_fresh)) + 
+salmon_scatt <- ggplot(salmon, aes(x = year, y = salmon_fresh)) + 
   geom_point()
 
 salmon_scatt
@@ -29,4 +29,116 @@ Overall, does it look like describing the relationship between
 year and fresh salmon imports using linear regression makes sense? Do you have any concerns about using linear regression to describe the relationship?
 
 - I think using a linear regression makes sense.
+
+###5. 
+
+The general syntax for linear regression in R is:
+model_name <- lm(y_variable ~ x_variable, data = df_name)
+
+So, if I have a data frame called ‘salmon’ containing variables ‘year’ and ‘salmon_fresh,’ I would use: salmon_model <- lm(salmon_fresh ~ year, data = salmon)
+
+a. Perform linear regression to describe the trend in total volume of fresh salmon imported to the U.S.from 1990 - 2017.
+
+b. Call the model name to see the intercept and slope for the model. Recall:
+y = β0 + β1x + 
+
+c. Write out the model equation, including the actual variables and coefficients instead of β and x/y. For example (these are not the actual model coefficients you’ll find): Imports(tons) = −400 + 25(Y ear)
+
+d. Think about the model equation that you found to describe trends in salmon imports. In your markdown document, answer the following in 1-sentence each:
+
+• What does the slope mean in the context of this model?
+• What does the y-intercept mean in the context of this model? Why is that concerning? What does this mean about extrapolating this model for past values?
+```{r}
+# a. Perform linear regression to describe the trend in total volume of fresh salmon imported to the U.S.from 1990 - 2017.
+
+salmon_lr <- lm(salmon_fresh ~ year, data = salmon)
+
+# b. Call the model name to see the intercept and slope for the model. Recall:y = β0 + β1x + 
+
+salmon_lr
+```
+c. Write out the model equation, including the actual variables and coefficients instead of β and x/y. For example (these are not the actual model coefficients you’ll find): Imports(tons) = −400 + 25(Year)
+
+Imports(tons) = -14982940 + 7550(Year)
+
+d. 
+• What does the slope mean in the context of this model?
+
+every 7,550 years
+
+• What does the y-intercept mean in the context of this model? Why is that concerning? What does this mean about extrapolating this model for past values?
+
+an increase in 15 million tons of salmon imports, not sustainable.
+
+###6. Model diagnostics
+
+Use plot(model_name) to view model diagnostics in the ‘Plots’ tab (press Enter in the Console to continue to subsequent diagnostic plots). Explore the diagnostic plots to answer the following:
+• Do residuals appear normally distributed?
+• Any concerns about heteroscedasticity or outliers?
+To view all four diagnostic plots at once (and have them appear in your knitted document), you can use the following:
+par(mfrow = c(2,2))
+plot(model_name)
+
+```{r}
+par(mfrow = c(2,2))
+plot(salmon)
+```
+
+###7. 
+
+Use summary(model_name) to see the detailed model information, including model fit information (e.g. R2 and coefficient standard errors) and statistics.
+
+See the lecture materials to interpret each component. Answer the following:
+• Does year significantly predict salmon imports?
+• What does the R2 value actually mean in words?
+• What proportion of the variance in salmon imports is NOT explained by year?
+
+```{r}
+summary(salmon_lr)
+```
+
+###8. 
+
+```{r}
+salmon_final_graph <- ggplot(salmon, aes(x = year, y = salmon_fresh)) +
+geom_point() +
+geom_smooth(method = lm, se = TRUE, size = 0.5, color = "gray20") +
+theme_bw() +
+scale_x_continuous(expand = c(0,0), limits = c(1990, 2017)) +
+labs(x = "Year", y = "U.S. Annual Fresh Salmon Imports\n(1,000 pounds)")
+
+salmon_final_graph
+```
+###9.
+Let’s say we want to use our model to make predictions for U.S. fresh salmon imports in years 2022, 2024, 2026 and 2028.
+```{r}
+#  Option 2 (recommended): Create a data frame containing the ‘new values’ that you want to make predictions for, feed that into the predict() function
+
+new_years <- data.frame(year = c(2022, 2024, 2026, 2028))
+
+new_years
+
+# Then feed that data frame into the predict() function, letting it know which model to use to make predictions for the new values.Include interval = “confidence” to also report the lower and upper bounds of the 95% CI for model fit at each year.
+
+future_predict <- predict(salmon_lr, newdata = new_years, interval = "confidence")
+
+future_predict
+
+# Bind the prediction outcomes (those are the values in column ‘fit’) with the ‘new_years’ data to actually create a useful table of predicted imports and upper and lower CI:
+
+predictions <- data.frame(new_years, future_predict)
+
+predictions
+```
+
+Use the cor.test() function to find Pearson’s r for the linear relationship described between year and salmon imports.
+
+Generally, if you’re trying to explore the correlation between variable_1 and variable_2 in data frame ‘df’, the function syntax is as follows:
+test_name <- cor.test(df$variable_1, df$variable_2)
+
+```{r}
+salmon_pearson <- cor.test(salmon$year, salmon$salmon_fresh)
+
+salmon_pearson
+```
 
