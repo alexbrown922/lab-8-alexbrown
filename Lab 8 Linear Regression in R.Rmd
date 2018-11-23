@@ -8,3 +8,25 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+```{r}
+library(tidyverse)
+
+salmon <- read_csv("salmon_imports.csv")
+```
+
+Make an Exploratory Scatterplot. If we’re going to use linear regression, we should have reason to think that a linear relationship exists between
+variables. So go ahead and look at the data (year on x-axis, imports on y-axis).
+
+```{r}
+salmon_scatt <- ggplot(salmon, aes(x = Year, y = salmon_fresh)) + 
+  geom_point()
+
+salmon_scatt
+```
+
+Overall, does it look like describing the relationship between
+year and fresh salmon imports using linear regression makes sense? Do you have any concerns about using linear regression to describe the relationship?
+
+- I think using a linear regression makes sense.
+
